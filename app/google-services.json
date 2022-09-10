@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "833063402132",
+    "project_id": "stock-breaking",
+    "storage_bucket": "stock-breaking.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833063402132:android:e812ae460f3e0eeda39281",
+        "android_client_info": {
+          "package_name": "com.msoft.mspartners"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833063402132-ohqitkgfjev1i125f5ttrvoh01ep1mqm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQ2n_okc3tilBIOUHRzruAJ_CTkYGm0Bg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833063402132-ohqitkgfjev1i125f5ttrvoh01ep1mqm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
