@@ -11,13 +11,15 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-public class FirebaseMessagingService extends  com.google.firebase.messaging.FirebaseMessagingService {
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "FirebaseMsgService";
     private  String msg, title, link;
 
@@ -40,6 +42,16 @@ public class FirebaseMessagingService extends  com.google.firebase.messaging.Fir
             link = "";
         }
         sendNotification(title, msg, link);
+    }
+
+    @Override
+    public void onNewToken(@NonNull String token) {
+        super.onNewToken(token);
+
+        Log.d(TAG, "onComplete() >> token: " + token);
+        PreferencesManager.setString(getApplicationContext(), "token", token);
+        token = PreferencesManager.getString(getApplicationContext(), "token");
+        Log.d(TAG, "onComplete() >> token: " + token);
     }
 
     public void sendNotification(String title, String message, String link) {

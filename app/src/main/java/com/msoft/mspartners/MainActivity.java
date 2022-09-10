@@ -33,12 +33,9 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
-
-import java.util.Locale;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -62,8 +59,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 2022-03-07 @Daniel Set firebase
-        setFirebase();
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
 
 //        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 //        progressBar.setVisibility(View.GONE);
@@ -364,29 +364,6 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(this, "Succeed Read/Write external storage !", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-    /**
-     * 2022-03-07 @Daniel
-     *
-     * Set firebase
-     */
-    private void setFirebase() {
-        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-            @Override
-            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "onComplete() >> getInstanceId failed: " + task.getException());
-                    return;
-                }
-                String token = task.getResult().getToken();
-                Log.d(TAG, "onComplete() >> token: " + token);
-                PreferencesManager.setString(getApplicationContext(), "token", token);
-                token = PreferencesManager.getString(getApplicationContext(), "token");
-                Log.d(TAG, "onComplete() >> token: " + token);
-            }
-        });
     }
 
     /**
