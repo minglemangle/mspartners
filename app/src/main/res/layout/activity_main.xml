@@ -18,9 +18,10 @@
         xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        android:background="#ebebeb"
+        ads:adUnitId="ca-app-pub-9468012007584859/5786461686"/>
     <!--<ProgressBar-->
     <!--    android:id="@+id/progressBar"-->
     <!--    android:layout_width="wrap_content"-->
