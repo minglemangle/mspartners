@@ -12,8 +12,8 @@ android {
         applicationId "com.msoft.mspartners"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 132
-        versionName "1.3.2"
+        versionCode 200
+        versionName "2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
