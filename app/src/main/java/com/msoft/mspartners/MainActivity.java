@@ -33,17 +33,22 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private String URL = "http://www.mspartners.co.kr/";
     private static final int MY_PERMISSIONS_REQUESTS = 0;
-    private WebView mWebView; // 웹뷰 선언
+    public WebView mWebView; // 웹뷰 선언
     private WebSettings mWebSettings; //웹뷰세팅
     private ProgressBar progressBar;
     private BackPressCloseHandler backPressCloseHandler;
@@ -57,21 +62,30 @@ public class MainActivity extends AppCompatActivity {
     private boolean goBackHome = false;
 
     private AdView mAdView;
+    public InterstitialAd mInterstitialAd;
+
+    public GoogleBillingImpl mGoogleBilling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        WebView.setWebContentsDebuggingEnabled(true);
+
+        mGoogleBilling = new GoogleBillingImpl(getApplicationContext(), this);
+        mGoogleBilling.init();
+
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
+                Log.d("FullAd", initializationStatus.toString());
+
+                mAdView = findViewById(R.id.adView);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                mAdView.loadAd(adRequest);
             }
         });
-
-        mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
 //        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 //        progressBar.setVisibility(View.GONE);
@@ -167,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         backPressCloseHandler = new BackPressCloseHandler(this);
 
         // 2022-03-07 @Daniel - Add javascript interface
-        mWebView.addJavascriptInterface(new JavaScriptInterface(), "JavaScript");
+        mWebView.addJavascriptInterface(new JavaScriptInterface(this), "JavaScript");
     }
 
 
@@ -374,13 +388,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void show_full_ad() {
+        AdRequest adRequestFull = new AdRequest.Builder().build();
+        InterstitialAd.load(this,"ca-app-pub-3940256099942544/1033173712", adRequestFull, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                // The mInterstitialAd reference will be null until
+                // an ad is loaded.
+                mInterstitialAd = interstitialAd;
+                Log.d("FullAd", "onAdLoaded");
+
+                mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+                    @Override
+                    public void onAdDismissedFullScreenContent() {
+                        // Called when fullscreen content is dismissed.
+                        Log.d("FullAd", "The ad was dismissed.");
+                    }
+
+                    @Override
+                    public void onAdFailedToShowFullScreenContent(AdError adError) {
+                        // Called when fullscreen content failed to show.
+                        Log.d("FullAd", "The ad failed to show.");
+                    }
+
+                    @Override
+                    public void onAdShowedFullScreenContent() {
+                        // Called when fullscreen content is shown.
+                        // Make sure to set your reference to null so you don't
+                        // show it a second time.
+                        mInterstitialAd = null;
+                        Log.d("FullAd", "The ad was shown.");
+                    }
+                });
+
+                mInterstitialAd.show(MainActivity.this);
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                // Handle the error
+                Log.d("FullAd", loadAdError.getMessage());
+                mInterstitialAd = null;
+            }
+        });
+    }
     /**
      * 2022-03-07 @Daniel
      *
      * Javascript interface
      */
     final class JavaScriptInterface {
-        JavaScriptInterface() { }
+        private MainActivity mMainActivity;
+        JavaScriptInterface(MainActivity mainActivity) {
+            this.mMainActivity = mainActivity;
+        }
 
         // Get device token
         @JavascriptInterface
@@ -392,6 +453,21 @@ public class MainActivity extends AppCompatActivity {
                     mWebView.loadUrl("javascript:setAndroidDeviceToken('" + token + "')");
                 }
             });
+        }
+
+        @JavascriptInterface
+        public void showFullAd() {
+            mWebView.post(new Runnable() {
+                @Override
+                public void run() {
+                    show_full_ad();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void requestPurchase() {
+            mMainActivity.mGoogleBilling.purchase(mMainActivity, "noad_30000");
         }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.msoft.mspartners">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.msoft.mspartners">
+    <uses-permission android:name="com.android.vending.BILLING"/>
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <!--네트워크 상태 퍼미션-->
@@ -43,7 +44,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize">
 
         </activity>
-        <activity android:name=".Splash">
+        <activity android:name=".Splash" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
